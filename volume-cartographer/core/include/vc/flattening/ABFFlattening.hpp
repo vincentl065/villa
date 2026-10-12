@@ -88,7 +88,10 @@ ABFDiagnostics diagnoseAbfFlattening(const QuadSurface& surface,
                                      std::size_t maxWorstVertices = 64);
 
 /**
- * @brief Flatten and store UVs in the surface's "uv" channel
+ * @brief Flatten and store UVs in the surface's "u" and "v" channels
+ *
+ * Both channels are CV_32FC1 grids matching the point grid (saved as u.tif
+ * and v.tif); grid points that were not flattened hold -1 in both.
  *
  * @param surface Surface to flatten (modified in place)
  * @param config Flattening configuration

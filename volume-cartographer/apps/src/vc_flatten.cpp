@@ -37,7 +37,7 @@ int main(int argc, char* argv[]) {
         ("no-scale", po::bool_switch()->default_value(false),
             "Don't scale output to match original 3D surface area")
         ("uv-only", po::bool_switch()->default_value(false),
-            "Only compute and save UV channel, don't create new surface");
+            "Only compute UVs and save them as u.tif / v.tif with the input grid, don't create new surface");
 
     po::positional_options_description pos;
     pos.add("input", 1);
@@ -56,7 +56,7 @@ int main(int argc, char* argv[]) {
             std::cout << "  vc_flatten /path/to/segment" << std::endl;
             std::cout << "  vc_flatten -i segment -o segment_flat --iterations 20" << std::endl;
             std::cout << "  vc_flatten segment --lscm-only" << std::endl;
-            std::cout << "  vc_flatten segment --uv-only  # Store UV channel without rasterizing" << std::endl;
+            std::cout << "  vc_flatten segment --uv-only  # Store u.tif / v.tif without rasterizing" << std::endl;
             return 0;
         }
 
@@ -104,7 +104,7 @@ int main(int argc, char* argv[]) {
     std::cout << "  Downsample factor: " << config.downsampleFactor << std::endl;
     std::cout << "  Use ABF++: " << (config.useABF ? "yes" : "no (LSCM only)") << std::endl;
     std::cout << "  Scale to original area: " << (config.scaleToOriginalArea ? "yes" : "no") << std::endl;
-    std::cout << "  Mode: " << (uvOnly ? "UV channel only" : "create new surface") << std::endl;
+    std::cout << "  Mode: " << (uvOnly ? "u / v channels only" : "create new surface") << std::endl;
 
     if (uvOnly) {
         // Just compute and save UV channel
@@ -114,8 +114,8 @@ int main(int argc, char* argv[]) {
             return 1;
         }
 
-        // Save the original surface with UV channel
-        std::cout << "Saving surface with UV channel to: " << outputPath << std::endl;
+        // Save the original surface with its u / v channels
+        std::cout << "Saving surface with u / v channels to: " << outputPath << std::endl;
         surf->saveEdited(inputPath, outputPath, true);
     } else {
         // Create a new surface with rearranged positions

@@ -1976,7 +1976,14 @@ bool abfFlattenInPlace(QuadSurface& surface, const ABFConfig& config) {
         return false;
     }
 
-    surface.setChannel("uv", uvs);
+    // Store U and V as two single-channel float channels. A two-channel
+    // CV_32FC2 "uv" channel cannot be saved: QuadSurface::writeChannelFile
+    // falls back to cv::imwrite, whose TIFF encoder only accepts 1, 3 or 4
+    // channels, and the uncaught cv::Exception terminated vc_flatten --uv-only.
+    std::vector<cv::Mat> uv;
+    cv::split(uvs, uv);
+    surface.setChannel("u", uv[0]);
+    surface.setChannel("v", uv[1]);
     return true;
 }
 
