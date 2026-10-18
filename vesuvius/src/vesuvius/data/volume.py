@@ -1,5 +1,6 @@
 from __future__ import annotations
 import os
+import posixpath
 import time
 import yaml
 import json
@@ -769,15 +770,19 @@ class Volume:
 
         # Construct inklabel URL (heuristic based on typical naming)
         base_url = self.url.rstrip('/')
+        # URLs always use '/'. os.path is ntpath on Windows, whose join puts a
+        # backslash into the URL; the request then 404s and the label below is
+        # silently replaced by a blank placeholder.
+        path_mod = posixpath if '://' in base_url else os.path
         # Extract parent URL and segment ID
-        parent_url = os.path.dirname(base_url)
-        segment_id_str = os.path.basename(base_url)
+        parent_url = path_mod.dirname(base_url)
+        segment_id_str = path_mod.basename(base_url)
         # Remove .zarr extension if present (fixes URL construction bug)
         if segment_id_str.endswith('.zarr'):
             segment_id_str = segment_id_str[:-5]
         # Construct ink label path
         inklabel_filename = f"{segment_id_str}_inklabels.png"
-        inklabel_url = os.path.join(parent_url, inklabel_filename)
+        inklabel_url = path_mod.join(parent_url, inklabel_filename)
 
         if self.verbose:
             print(f"Attempting to load ink label from: {inklabel_url}")
